@@ -52,6 +52,16 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				// Blog-specific colors
+				'blog-primary': 'hsl(var(--blog-primary))',
+				'blog-primary-foreground': 'hsl(var(--blog-primary-foreground))',
+				'blog-surface': 'hsl(var(--blog-surface))',
+				'blog-surface-hover': 'hsl(var(--blog-surface-hover))',
+				'blog-text-primary': 'hsl(var(--blog-text-primary))',
+				'blog-text-secondary': 'hsl(var(--blog-text-secondary))',
+				'blog-border': 'hsl(var(--blog-border))',
+				'blog-tag-bg': 'hsl(var(--blog-tag-bg))',
+				'blog-tag-text': 'hsl(var(--blog-tag-text))',
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
