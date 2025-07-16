@@ -1,14 +1,16 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/api';
 import { Post, PaginatedResponse, CreatePostData, UpdatePostData } from '@/types';
+import { allDummyPosts, getPaginatedPosts, dummyPosts } from '@/lib/dummyData';
 
 // Get recommended posts
 export const useRecommendedPosts = (limit = 10, page = 1) => {
   return useQuery({
     queryKey: ['posts', 'recommended', limit, page],
     queryFn: async (): Promise<PaginatedResponse<Post>> => {
-      const { data } = await api.get(`/posts/recommended?limit=${limit}&page=${page}`);
-      return data;
+      // Use dummy data instead of API call
+      await new Promise(resolve => setTimeout(resolve, 500)); // Simulate loading
+      return getPaginatedPosts(allDummyPosts, page, limit);
     },
   });
 };
@@ -18,8 +20,10 @@ export const useMostLikedPosts = (limit = 10, page = 1) => {
   return useQuery({
     queryKey: ['posts', 'most-liked', limit, page],
     queryFn: async (): Promise<PaginatedResponse<Post>> => {
-      const { data } = await api.get(`/posts/most-liked?limit=${limit}&page=${page}`);
-      return data;
+      // Use dummy data sorted by likes
+      await new Promise(resolve => setTimeout(resolve, 500)); // Simulate loading
+      const sortedPosts = [...allDummyPosts].sort((a, b) => b.likes - a.likes);
+      return getPaginatedPosts(sortedPosts, page, limit);
     },
   });
 };

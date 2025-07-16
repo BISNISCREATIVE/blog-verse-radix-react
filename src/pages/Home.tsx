@@ -4,39 +4,59 @@ import { ChevronRight, ChevronLeft } from 'lucide-react';
 import { Layout } from '@/components/layout/Layout';
 import { useRecommendedPosts, useMostLikedPosts } from '@/hooks/usePosts';
 import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 export const Home = () => {
+  const [currentPage, setCurrentPage] = useState(1);
+  
   const { 
     data: recommendedPosts, 
     isLoading: isLoadingRecommended 
-  } = useRecommendedPosts(10, 1);
+  } = useRecommendedPosts(5, currentPage);
   
   const { 
     data: mostLikedPosts, 
     isLoading: isLoadingMostLiked 
-  } = useMostLikedPosts(10, 1);
-
-  const PaginationControls = () => (
+  } = useMostLikedPosts(5, 1);
+  
+  const PaginationControls = ({ pagination }: { pagination: any }) => (
     <div className="flex items-center justify-center gap-2 mt-8">
-      <Button variant="ghost" size="sm" disabled>
+      <Button 
+        variant="ghost" 
+        size="sm" 
+        disabled={currentPage === 1}
+        onClick={() => setCurrentPage(currentPage - 1)}
+      >
         <ChevronLeft className="h-4 w-4" />
         Previous
       </Button>
       
       <div className="flex items-center gap-1">
-        <Button variant="default" size="sm" className="w-8 h-8 p-0 rounded-full">
-          1
-        </Button>
-        <Button variant="ghost" size="sm" className="w-8 h-8 p-0 rounded-full">
-          2
-        </Button>
-        <Button variant="ghost" size="sm" className="w-8 h-8 p-0 rounded-full">
-          3
-        </Button>
-        <span className="text-muted-foreground px-2">...</span>
+        {Array.from({ length: Math.min(5, pagination?.lastPage || 1) }, (_, i) => {
+          const page = i + 1;
+          return (
+            <Button 
+              key={page}
+              variant={currentPage === page ? "default" : "ghost"} 
+              size="sm" 
+              className="w-8 h-8 p-0 rounded-full"
+              onClick={() => setCurrentPage(page)}
+            >
+              {page}
+            </Button>
+          );
+        })}
+        {(pagination?.lastPage || 0) > 5 && (
+          <span className="text-muted-foreground px-2">...</span>
+        )}
       </div>
       
-      <Button variant="ghost" size="sm">
+      <Button 
+        variant="ghost" 
+        size="sm"
+        disabled={currentPage === pagination?.lastPage}
+        onClick={() => setCurrentPage(currentPage + 1)}
+      >
         Next
         <ChevronRight className="h-4 w-4" />
       </Button>
@@ -125,11 +145,10 @@ export const Home = () => {
                         
                         <div className="flex items-center justify-between pt-4">
                           <div className="flex items-center gap-3">
-                            <img
-                              src={post.author.avatarUrl || '/placeholder.svg'}
-                              alt={post.author.name}
-                              className="w-8 h-8 rounded-full"
-                            />
+                            <Avatar className="w-8 h-8">
+                              <AvatarImage src={post.author.avatarUrl} alt={post.author.name} />
+                              <AvatarFallback>{post.author.name.charAt(0)}</AvatarFallback>
+                            </Avatar>
                             <div className="flex items-center gap-2">
                               <span className="text-base font-medium text-foreground">
                                 {post.author.name}
@@ -161,7 +180,7 @@ export const Home = () => {
                   </Link>
                 ))}
                 
-                <PaginationControls />
+                <PaginationControls pagination={recommendedPosts} />
               </div>
             )}
           </div>
