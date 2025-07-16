@@ -1,13 +1,13 @@
 import { Link } from 'react-router-dom';
-import { Heart, MessageCircle, Calendar } from 'lucide-react';
+import { MessageCircle, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
 import { Post } from '@/types';
-import { useLikePost } from '@/hooks/usePosts';
 import { useAuth } from '@/hooks/useAuth';
+import { LikeButton } from './LikeButton';
+import { PostCardActions } from './PostCardActions';
 
 interface PostCardProps {
   post: Post;
@@ -15,16 +15,9 @@ interface PostCardProps {
 }
 
 export const PostCard = ({ post, variant = 'default' }: PostCardProps) => {
-  const { isAuthenticated } = useAuth();
-  const likeMutation = useLikePost();
-
-  const handleLike = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (isAuthenticated) {
-      likeMutation.mutate(post.id.toString());
-    }
-  };
+  const { isAuthenticated, user } = useAuth();
+  
+  const isOwner = user?.id === post.author.id;
 
   const formatDate = (dateString: string) => {
     try {
@@ -58,18 +51,12 @@ export const PostCard = ({ post, variant = 'default' }: PostCardProps) => {
               
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4 text-sm text-blog-text-secondary">
-                  <button
-                    onClick={handleLike}
-                    className={`flex items-center gap-1 hover:text-blog-primary transition-colors ${
-                      post.isLiked ? 'text-red-500' : ''
-                    }`}
-                    disabled={!isAuthenticated}
-                  >
-                    <Heart 
-                      className={`w-4 h-4 ${post.isLiked ? 'fill-current' : ''}`} 
-                    />
-                    {post.likes}
-                  </button>
+                  <LikeButton
+                    postId={post.id.toString()}
+                    likes={post.likes}
+                    isLiked={post.isLiked}
+                    size="sm"
+                  />
                   
                   <div className="flex items-center gap-1">
                     <MessageCircle className="w-4 h-4" />
@@ -139,25 +126,22 @@ export const PostCard = ({ post, variant = 'default' }: PostCardProps) => {
               </div>
               
               <div className="flex items-center gap-4">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleLike}
-                  className={`text-blog-text-secondary hover:text-blog-primary ${
-                    post.isLiked ? 'text-red-500' : ''
-                  }`}
-                  disabled={!isAuthenticated}
-                >
-                  <Heart 
-                    className={`w-4 h-4 mr-1 ${post.isLiked ? 'fill-current' : ''}`} 
-                  />
-                  {post.likes}
-                </Button>
+                <LikeButton
+                  postId={post.id.toString()}
+                  likes={post.likes}
+                  isLiked={post.isLiked}
+                />
                 
                 <div className="flex items-center text-blog-text-secondary">
                   <MessageCircle className="w-4 h-4 mr-1" />
                   {post.comments}
                 </div>
+
+                <PostCardActions
+                  postId={post.id.toString()}
+                  isOwner={isOwner}
+                  title={post.title}
+                />
               </div>
             </div>
           </div>

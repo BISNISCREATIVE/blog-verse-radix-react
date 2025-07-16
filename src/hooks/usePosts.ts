@@ -1,16 +1,15 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import api from '@/lib/api';
+import { postsApi } from '@/lib/api';
 import { Post, PaginatedResponse, CreatePostData, UpdatePostData } from '@/types';
-import { allDummyPosts, getPaginatedPosts, dummyPosts } from '@/lib/dummyData';
+import { useToast } from '@/hooks/use-toast';
 
 // Get recommended posts
 export const useRecommendedPosts = (limit = 10, page = 1) => {
   return useQuery({
     queryKey: ['posts', 'recommended', limit, page],
     queryFn: async (): Promise<PaginatedResponse<Post>> => {
-      // Use dummy data instead of API call
-      await new Promise(resolve => setTimeout(resolve, 500)); // Simulate loading
-      return getPaginatedPosts(allDummyPosts, page, limit);
+      const response = await postsApi.getRecommended(limit, page);
+      return response.data;
     },
   });
 };
@@ -20,10 +19,8 @@ export const useMostLikedPosts = (limit = 10, page = 1) => {
   return useQuery({
     queryKey: ['posts', 'most-liked', limit, page],
     queryFn: async (): Promise<PaginatedResponse<Post>> => {
-      // Use dummy data sorted by likes
-      await new Promise(resolve => setTimeout(resolve, 500)); // Simulate loading
-      const sortedPosts = [...allDummyPosts].sort((a, b) => b.likes - a.likes);
-      return getPaginatedPosts(sortedPosts, page, limit);
+      const response = await postsApi.getMostLiked(limit, page);
+      return response.data;
     },
   });
 };
@@ -33,8 +30,8 @@ export const useMyPosts = (limit = 10, page = 1) => {
   return useQuery({
     queryKey: ['posts', 'my-posts', limit, page],
     queryFn: async (): Promise<PaginatedResponse<Post>> => {
-      const { data } = await api.get(`/posts/my-posts?limit=${limit}&page=${page}`);
-      return data;
+      const response = await postsApi.getMyPosts(limit, page);
+      return response.data;
     },
   });
 };
@@ -44,8 +41,8 @@ export const useSearchPosts = (query: string, limit = 10, page = 1) => {
   return useQuery({
     queryKey: ['posts', 'search', query, limit, page],
     queryFn: async (): Promise<PaginatedResponse<Post>> => {
-      const { data } = await api.get(`/posts/search?query=${encodeURIComponent(query)}&limit=${limit}&page=${page}`);
-      return data;
+      const response = await postsApi.search(query, limit, page);
+      return response.data;
     },
     enabled: !!query,
   });
@@ -56,8 +53,8 @@ export const usePost = (id: string) => {
   return useQuery({
     queryKey: ['posts', id],
     queryFn: async (): Promise<Post> => {
-      const { data } = await api.get(`/posts/${id}`);
-      return data;
+      const response = await postsApi.getById(id);
+      return response.data;
     },
   });
 };
@@ -67,8 +64,8 @@ export const usePostsByUser = (userId: string, limit = 10, page = 1) => {
   return useQuery({
     queryKey: ['posts', 'by-user', userId, limit, page],
     queryFn: async (): Promise<PaginatedResponse<Post>> => {
-      const { data } = await api.get(`/posts/by-user/${userId}?limit=${limit}&page=${page}`);
-      return data;
+      const response = await postsApi.getByUser(userId, limit, page);
+      return response.data;
     },
   });
 };
@@ -76,6 +73,7 @@ export const usePostsByUser = (userId: string, limit = 10, page = 1) => {
 // Create post mutation
 export const useCreatePost = () => {
   const queryClient = useQueryClient();
+  const { toast } = useToast();
   
   return useMutation({
     mutationFn: async (data: CreatePostData): Promise<Post> => {
@@ -87,15 +85,22 @@ export const useCreatePost = () => {
         formData.append('image', data.image);
       }
       
-      const { data: response } = await api.post('/posts', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      return response;
+      const response = await postsApi.create(formData);
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['posts'] });
+      toast({
+        title: "Success",
+        description: "Post created successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.response?.data?.message || "Failed to create post",
+        variant: "destructive",
+      });
     },
   });
 };
@@ -103,6 +108,7 @@ export const useCreatePost = () => {
 // Update post mutation
 export const useUpdatePost = () => {
   const queryClient = useQueryClient();
+  const { toast } = useToast();
   
   return useMutation({
     mutationFn: async ({ id, data }: { id: string; data: UpdatePostData }): Promise<Post> => {
@@ -112,15 +118,22 @@ export const useUpdatePost = () => {
       if (data.tags) formData.append('tags', data.tags.join(','));
       if (data.image) formData.append('image', data.image);
       
-      const { data: response } = await api.patch(`/posts/${id}`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      return response;
+      const response = await postsApi.update(id, formData);
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['posts'] });
+      toast({
+        title: "Success",
+        description: "Post updated successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.response?.data?.message || "Failed to update post",
+        variant: "destructive",
+      });
     },
   });
 };
@@ -128,14 +141,26 @@ export const useUpdatePost = () => {
 // Delete post mutation
 export const useDeletePost = () => {
   const queryClient = useQueryClient();
+  const { toast } = useToast();
   
   return useMutation({
     mutationFn: async (id: string): Promise<{ success: boolean }> => {
-      const { data } = await api.delete(`/posts/${id}`);
-      return data;
+      const response = await postsApi.delete(id);
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['posts'] });
+      toast({
+        title: "Success",
+        description: "Post deleted successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.response?.data?.message || "Failed to delete post",
+        variant: "destructive",
+      });
     },
   });
 };
@@ -143,14 +168,22 @@ export const useDeletePost = () => {
 // Like post mutation
 export const useLikePost = () => {
   const queryClient = useQueryClient();
+  const { toast } = useToast();
   
   return useMutation({
     mutationFn: async (id: string): Promise<Post> => {
-      const { data } = await api.post(`/posts/${id}/like`);
-      return data;
+      const response = await postsApi.like(id);
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['posts'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.response?.data?.message || "Failed to like post",
+        variant: "destructive",
+      });
     },
   });
 };
