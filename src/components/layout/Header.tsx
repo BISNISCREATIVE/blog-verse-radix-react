@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Search, Menu, User, LogOut, Edit, Settings } from 'lucide-react';
+import { Search, PenIcon, Menu, User, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -8,6 +8,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
@@ -18,11 +19,9 @@ export const Header = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
+  const handleSearch = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && searchQuery.trim()) {
       navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
     }
   };
@@ -32,191 +31,151 @@ export const Header = () => {
     navigate('/');
   };
 
-  const NavItems = () => (
-    <>
-      <Link to="/" className="text-blog-text-primary hover:text-blog-primary transition-colors">
-        Home
-      </Link>
-      {isAuthenticated && (
-        <Link to="/write" className="text-blog-text-primary hover:text-blog-primary transition-colors">
-          Write
-        </Link>
-      )}
-    </>
-  );
-
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-blog-surface/95 backdrop-blur supports-[backdrop-filter]:bg-blog-surface/60">
-      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        {/* Logo */}
-        <Link to="/" className="flex items-center space-x-2">
-          <div className="w-8 h-8 bg-blog-primary rounded-lg flex items-center justify-center">
-            <span className="text-blog-primary-foreground font-bold text-lg">B</span>
-          </div>
-          <span className="font-bold text-xl text-blog-text-primary hidden sm:block">
-            BlogVerse
-          </span>
-        </Link>
-
-        {/* Search Bar - Desktop */}
-        <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-md mx-8">
-          <div className="relative w-full">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blog-text-secondary w-4 h-4" />
-            <Input
-              type="search"
-              placeholder="Search posts..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 w-full"
-            />
-          </div>
-        </form>
-
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-6">
-          <NavItems />
-          
-          {isAuthenticated ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={user?.avatarUrl} alt={user?.name} />
-                    <AvatarFallback>
-                      {user?.name?.split(' ').map(n => n[0]).join('').toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end" forceMount>
-                <div className="flex items-center justify-start gap-2 p-2">
-                  <div className="flex flex-col space-y-1 leading-none">
-                    <p className="font-medium">{user?.name}</p>
-                    <p className="text-xs text-blog-text-secondary">
-                      {user?.email}
-                    </p>
-                  </div>
-                </div>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link to="/profile" className="cursor-pointer">
-                    <User className="mr-2 h-4 w-4" />
-                    Profile
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/write" className="cursor-pointer">
-                    <Edit className="mr-2 h-4 w-4" />
-                    Write Post
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/settings" className="cursor-pointer">
-                    <Settings className="mr-2 h-4 w-4" />
-                    Settings
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Logout
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <div className="flex items-center space-x-2">
-              <Button asChild variant="ghost">
-                <Link to="/login">Login</Link>
-              </Button>
-              <Button asChild>
-                <Link to="/register">Register</Link>
-              </Button>
+    <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container mx-auto px-4">
+        <div className="flex h-16 items-center justify-between">
+          {/* Logo */}
+          <Link to="/" className="flex items-center gap-2">
+            <div className="h-8 w-8 rounded bg-primary flex items-center justify-center">
+              <span className="text-primary-foreground font-bold text-sm">📝</span>
             </div>
-          )}
-        </nav>
+            <span className="font-bold text-xl text-foreground">Your Logo</span>
+          </Link>
 
-        {/* Mobile Navigation */}
-        <div className="md:hidden flex items-center space-x-2">
-          {/* Search Button - Mobile */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate('/search')}
-          >
-            <Search className="h-4 w-4" />
-          </Button>
+          {/* Desktop Search */}
+          <div className="hidden md:flex items-center gap-4 flex-1 max-w-md mx-8">
+            <div className="relative w-full">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="Search"
+                className="pl-10 w-full rounded-full border-muted bg-muted/50"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={handleSearch}
+              />
+            </div>
+          </div>
 
-          {/* Mobile Menu */}
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="sm">
-                <Menu className="h-4 w-4" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-[280px] sm:w-[350px]">
-              <div className="flex flex-col space-y-4 mt-8">
-                {isAuthenticated && (
-                  <div className="flex items-center space-x-3 p-4 border rounded-lg">
-                    <Avatar className="h-10 w-10">
-                      <AvatarImage src={user?.avatarUrl} alt={user?.name} />
-                      <AvatarFallback>
-                        {user?.name?.split(' ').map(n => n[0]).join('').toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="font-medium">{user?.name}</p>
-                      <p className="text-sm text-blog-text-secondary">{user?.email}</p>
-                    </div>
-                  </div>
-                )}
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center gap-4">
+            {user ? (
+              <>
+                <Link
+                  to="/write"
+                  className="flex items-center gap-2 text-primary hover:text-primary/80 font-medium"
+                >
+                  <PenIcon className="h-4 w-4" />
+                  Write Post
+                </Link>
                 
-                <nav className="flex flex-col space-y-3">
-                  <Link 
-                    to="/" 
-                    className="text-blog-text-primary hover:text-blog-primary transition-colors p-2"
-                  >
-                    Home
-                  </Link>
-                  
-                  {isAuthenticated ? (
-                    <>
-                      <Link 
-                        to="/write" 
-                        className="text-blog-text-primary hover:text-blog-primary transition-colors p-2"
-                      >
-                        Write Post
-                      </Link>
-                      <Link 
-                        to="/profile" 
-                        className="text-blog-text-primary hover:text-blog-primary transition-colors p-2"
-                      >
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src={user.avatarUrl} alt={user.name} />
+                        <AvatarFallback>{user.name?.charAt(0)}</AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56" align="end" forceMount>
+                    <DropdownMenuLabel className="font-normal">
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-medium leading-none">{user.name}</p>
+                        <p className="text-xs leading-none text-muted-foreground">
+                          {user.email}
+                        </p>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link to="/profile" className="flex items-center gap-2">
+                        <User className="h-4 w-4" />
                         Profile
                       </Link>
-                      <Link 
-                        to="/settings" 
-                        className="text-blog-text-primary hover:text-blog-primary transition-colors p-2"
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleLogout} className="flex items-center gap-2">
+                      <LogOut className="h-4 w-4" />
+                      Logout
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
+            ) : (
+              <>
+                <Link to="/login" className="text-sm font-medium hover:text-primary text-primary">
+                  Login
+                </Link>
+                <Link to="/register">
+                  <Button className="rounded-full">Register</Button>
+                </Link>
+              </>
+            )}
+          </nav>
+
+          {/* Mobile Menu */}
+          <div className="md:hidden">
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right">
+                <div className="flex flex-col gap-4 mt-8">
+                  {/* Mobile Search */}
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      type="search"
+                      placeholder="Search"
+                      className="pl-10 w-full"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onKeyDown={handleSearch}
+                    />
+                  </div>
+                  
+                  {user ? (
+                    <>
+                      <Link
+                        to="/write"
+                        className="flex items-center gap-2 text-primary font-medium p-2"
                       >
-                        Settings
+                        <PenIcon className="h-4 w-4" />
+                        Write Post
                       </Link>
-                      <Button onClick={handleLogout} variant="outline" className="justify-start">
-                        <LogOut className="mr-2 h-4 w-4" />
+                      <Link
+                        to="/profile"
+                        className="flex items-center gap-2 font-medium p-2"
+                      >
+                        <User className="h-4 w-4" />
+                        Profile
+                      </Link>
+                      <Button
+                        variant="ghost"
+                        onClick={handleLogout}
+                        className="justify-start p-2 h-auto font-medium"
+                      >
+                        <LogOut className="h-4 w-4 mr-2" />
                         Logout
                       </Button>
                     </>
                   ) : (
-                    <div className="flex flex-col space-y-2">
-                      <Button asChild variant="outline">
-                        <Link to="/login">Login</Link>
-                      </Button>
-                      <Button asChild>
-                        <Link to="/register">Register</Link>
-                      </Button>
-                    </div>
+                    <>
+                      <Link to="/login" className="font-medium p-2 text-primary">
+                        Login
+                      </Link>
+                      <Link to="/register" className="p-2">
+                        <Button className="w-full">Register</Button>
+                      </Link>
+                    </>
                   )}
-                </nav>
-              </div>
-            </SheetContent>
-          </Sheet>
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
         </div>
       </div>
     </header>

@@ -1,229 +1,217 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronRight, TrendingUp, BookOpen } from 'lucide-react';
+import { ChevronRight, ChevronLeft } from 'lucide-react';
 import { Layout } from '@/components/layout/Layout';
-import { PostGrid } from '@/components/blog/PostGrid';
-import { LoadingPostCard } from '@/components/blog/LoadingPostCard';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useRecommendedPosts, useMostLikedPosts } from '@/hooks/usePosts';
+import { Button } from '@/components/ui/button';
 
 export const Home = () => {
-  const [recommendedPage, setRecommendedPage] = useState(1);
-  const [mostLikedPage, setMostLikedPage] = useState(1);
+  const { 
+    data: recommendedPosts, 
+    isLoading: isLoadingRecommended 
+  } = useRecommendedPosts(10, 1);
+  
+  const { 
+    data: mostLikedPosts, 
+    isLoading: isLoadingMostLiked 
+  } = useMostLikedPosts(10, 1);
 
-  const {
-    data: recommendedData,
-    isLoading: isLoadingRecommended,
-    error: recommendedError,
-  } = useRecommendedPosts(10, recommendedPage);
-
-  const {
-    data: mostLikedData,
-    isLoading: isLoadingMostLiked,
-    error: mostLikedError,
-  } = useMostLikedPosts(10, mostLikedPage);
+  const PaginationControls = () => (
+    <div className="flex items-center justify-center gap-2 mt-8">
+      <Button variant="ghost" size="sm" disabled>
+        <ChevronLeft className="h-4 w-4" />
+        Previous
+      </Button>
+      
+      <div className="flex items-center gap-1">
+        <Button variant="default" size="sm" className="w-8 h-8 p-0 rounded-full">
+          1
+        </Button>
+        <Button variant="ghost" size="sm" className="w-8 h-8 p-0 rounded-full">
+          2
+        </Button>
+        <Button variant="ghost" size="sm" className="w-8 h-8 p-0 rounded-full">
+          3
+        </Button>
+        <span className="text-muted-foreground px-2">...</span>
+      </div>
+      
+      <Button variant="ghost" size="sm">
+        Next
+        <ChevronRight className="h-4 w-4" />
+      </Button>
+    </div>
+  );
 
   const LoadingGrid = () => (
     <div className="space-y-6">
-      {Array.from({ length: 3 }).map((_, i) => (
-        <LoadingPostCard key={i} />
+      {Array.from({ length: 5 }).map((_, i) => (
+        <div key={i} className="animate-pulse flex gap-4">
+          <div className="w-64 h-48 bg-muted rounded-lg"></div>
+          <div className="flex-1 space-y-3">
+            <div className="h-6 bg-muted rounded w-3/4"></div>
+            <div className="h-4 bg-muted rounded w-1/2"></div>
+            <div className="h-4 bg-muted rounded w-full"></div>
+          </div>
+        </div>
       ))}
     </div>
   );
 
-  const MostLikedSidebar = () => (
-    <div className="w-full lg:w-80">
-      <div className="sticky top-24">
-        <div className="bg-blog-surface border border-blog-border rounded-lg p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <TrendingUp className="w-5 h-5 text-blog-primary" />
-            <h2 className="text-lg font-semibold text-blog-text-primary">Most Liked</h2>
+  const SidebarLoading = () => (
+    <div className="space-y-4">
+      {Array.from({ length: 5 }).map((_, i) => (
+        <div key={i} className="animate-pulse space-y-2">
+          <div className="h-4 bg-muted rounded w-3/4"></div>
+          <div className="h-3 bg-muted rounded w-1/2"></div>
+          <div className="flex gap-4">
+            <div className="h-3 bg-muted rounded w-12"></div>
+            <div className="h-3 bg-muted rounded w-12"></div>
           </div>
-          
-          {isLoadingMostLiked ? (
-            <div className="space-y-4">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <LoadingPostCard key={i} variant="compact" />
-              ))}
-            </div>
-          ) : mostLikedError ? (
-            <div className="text-center py-4">
-              <p className="text-blog-text-secondary text-sm">Failed to load popular posts</p>
-            </div>
-          ) : mostLikedData?.data ? (
-            <div className="space-y-4">
-              <PostGrid 
-                posts={mostLikedData.data.slice(0, 5)} 
-                variant="compact" 
-              />
-              {mostLikedData.data.length > 5 && (
-                <Button asChild variant="outline" className="w-full">
-                  <Link to="/popular">
-                    View All Popular Posts
-                    <ChevronRight className="w-4 h-4 ml-1" />
-                  </Link>
-                </Button>
-              )}
-            </div>
-          ) : (
-            <div className="text-center py-4">
-              <p className="text-blog-text-secondary text-sm">No popular posts found</p>
-            </div>
-          )}
         </div>
-      </div>
+      ))}
     </div>
   );
 
   return (
     <Layout>
       <div className="container mx-auto px-4 py-8">
-        {/* Hero Section */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-blog-text-primary mb-4">
-            Welcome to <span className="text-blog-primary">BlogVerse</span>
-          </h1>
-          <p className="text-xl text-blog-text-secondary max-w-2xl mx-auto mb-8">
-            Discover amazing stories, share your thoughts, and connect with writers from around the world.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button asChild size="lg">
-              <Link to="/register">
-                Start Writing
-                <BookOpen className="w-4 h-4 ml-2" />
-              </Link>
-            </Button>
-            <Button asChild variant="outline" size="lg">
-              <Link to="/search">
-                Explore Posts
-              </Link>
-            </Button>
-          </div>
-        </div>
-
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Main Content */}
-          <div className="flex-1">
-            <Tabs defaultValue="recommended" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 mb-8">
-                <TabsTrigger value="recommended" className="flex items-center gap-2">
-                  <BookOpen className="w-4 h-4" />
-                  Recommended For You
-                </TabsTrigger>
-                <TabsTrigger value="recent" className="flex items-center gap-2">
-                  <TrendingUp className="w-4 h-4" />
-                  Recent Posts
-                </TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="recommended">
-                <div className="mb-6">
-                  <h2 className="text-2xl font-bold text-blog-text-primary mb-2">
-                    Recommended For You
-                  </h2>
-                  <p className="text-blog-text-secondary">
-                    Discover posts tailored to your interests
-                  </p>
-                </div>
-
-                {isLoadingRecommended ? (
-                  <LoadingGrid />
-                ) : recommendedError ? (
-                  <div className="text-center py-12">
-                    <div className="text-blog-text-secondary">
-                      <div className="text-6xl mb-4">⚠️</div>
-                      <h3 className="text-lg font-medium mb-2">Something went wrong</h3>
-                      <p className="text-sm">Failed to load recommended posts. Please try again later.</p>
-                    </div>
-                  </div>
-                ) : recommendedData?.data ? (
-                  <>
-                    <PostGrid posts={recommendedData.data} />
-                    
-                    {recommendedData.page < recommendedData.lastPage && (
-                      <div className="text-center mt-8">
-                        <Button
-                          onClick={() => setRecommendedPage(prev => prev + 1)}
-                          variant="outline"
-                        >
-                          Load More Posts
-                        </Button>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+          {/* Recommended Posts Section */}
+          <div className="lg:col-span-2">
+            <div className="mb-8">
+              <h2 className="text-3xl font-bold text-foreground">
+                Recommend For You
+              </h2>
+            </div>
+            
+            {isLoadingRecommended ? (
+              <LoadingGrid />
+            ) : (
+              <div className="space-y-8">
+                {recommendedPosts?.data?.map((post) => (
+                  <Link 
+                    key={post.id} 
+                    to={`/post/${post.id}`}
+                    className="block group"
+                  >
+                    <div className="flex gap-6">
+                      <div className="w-64 h-48 flex-shrink-0 rounded-lg overflow-hidden">
+                        <img
+                          src={post.imageUrl || '/placeholder.svg'}
+                          alt={post.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                        />
                       </div>
-                    )}
-                  </>
-                ) : (
-                  <div className="text-center py-12">
-                    <div className="text-blog-text-secondary">
-                      <div className="text-6xl mb-4">📝</div>
-                      <h3 className="text-lg font-medium mb-2">No posts yet</h3>
-                      <p className="text-sm">Be the first to share your story!</p>
-                      <Button asChild className="mt-4">
-                        <Link to="/write">Write Your First Post</Link>
-                      </Button>
+                      <div className="flex-1 space-y-4">
+                        <div>
+                          <h3 className="text-xl font-bold text-foreground line-clamp-2 mb-3 group-hover:text-primary transition-colors">
+                            {post.title}
+                          </h3>
+                          <div className="flex gap-2 mb-4">
+                            {post.tags.map((tag) => (
+                              <span
+                                key={tag}
+                                className="px-3 py-1 bg-muted text-sm text-foreground rounded-full border"
+                              >
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+                          <p className="text-muted-foreground text-base line-clamp-3 leading-relaxed">
+                            {post.content}
+                          </p>
+                        </div>
+                        
+                        <div className="flex items-center justify-between pt-4">
+                          <div className="flex items-center gap-3">
+                            <img
+                              src={post.author.avatarUrl || '/placeholder.svg'}
+                              alt={post.author.name}
+                              className="w-8 h-8 rounded-full"
+                            />
+                            <div className="flex items-center gap-2">
+                              <span className="text-base font-medium text-foreground">
+                                {post.author.name}
+                              </span>
+                              <span className="text-muted-foreground">•</span>
+                              <span className="text-muted-foreground">
+                                {new Date(post.createdAt).toLocaleDateString('en-US', { 
+                                  day: 'numeric', 
+                                  month: 'short', 
+                                  year: 'numeric' 
+                                })}
+                              </span>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center gap-6 text-muted-foreground">
+                            <div className="flex items-center gap-2">
+                              <span className="text-lg">👍</span>
+                              <span className="font-medium">{post.likes}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-lg">💬</span>
+                              <span className="font-medium">{post.comments}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                )}
-              </TabsContent>
-
-              <TabsContent value="recent">
-                <div className="mb-6">
-                  <h2 className="text-2xl font-bold text-blog-text-primary mb-2">
-                    Recent Posts
-                  </h2>
-                  <p className="text-blog-text-secondary">
-                    Latest stories from our community
-                  </p>
-                </div>
+                  </Link>
+                ))}
                 
-                {/* For now showing recommended posts, you can create a separate hook for recent posts */}
-                {isLoadingRecommended ? (
-                  <LoadingGrid />
-                ) : recommendedData?.data ? (
-                  <PostGrid posts={recommendedData.data} />
-                ) : (
-                  <div className="text-center py-12">
-                    <div className="text-blog-text-secondary">
-                      <div className="text-6xl mb-4">📝</div>
-                      <h3 className="text-lg font-medium mb-2">No recent posts</h3>
-                      <p className="text-sm">Check back later for new content!</p>
-                    </div>
-                  </div>
-                )}
-              </TabsContent>
-            </Tabs>
+                <PaginationControls />
+              </div>
+            )}
           </div>
 
-          {/* Sidebar - Desktop Only */}
-          <div className="hidden lg:block">
-            <MostLikedSidebar />
-          </div>
-        </div>
-
-        {/* Mobile Most Liked Section */}
-        <div className="lg:hidden mt-12">
-          <div className="border-t border-blog-border pt-8">
-            <div className="flex items-center gap-2 mb-6">
-              <TrendingUp className="w-5 h-5 text-blog-primary" />
-              <h2 className="text-xl font-semibold text-blog-text-primary">Most Liked Posts</h2>
+          {/* Most Liked Posts Sidebar */}
+          <div className="lg:col-span-1">
+            <div className="mb-8">
+              <h2 className="text-3xl font-bold text-foreground">
+                Most Liked
+              </h2>
             </div>
             
             {isLoadingMostLiked ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <LoadingPostCard key={i} variant="compact" />
+              <SidebarLoading />
+            ) : (
+              <div className="space-y-8">
+                {mostLikedPosts?.data?.slice(0, 5).map((post) => (
+                  <Link 
+                    key={post.id} 
+                    to={`/post/${post.id}`}
+                    className="block group space-y-3"
+                  >
+                    <h4 className="font-bold text-foreground line-clamp-2 text-lg leading-tight group-hover:text-primary transition-colors">
+                      {post.title}
+                    </h4>
+                    <p className="text-muted-foreground line-clamp-2 text-sm leading-relaxed">
+                      {post.content}
+                    </p>
+                    <div className="flex items-center gap-6 text-muted-foreground text-sm">
+                      <div className="flex items-center gap-2">
+                        <span>👍</span>
+                        <span className="font-medium">{post.likes}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span>💬</span>
+                        <span className="font-medium">{post.comments}</span>
+                      </div>
+                    </div>
+                  </Link>
                 ))}
               </div>
-            ) : mostLikedData?.data ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {mostLikedData.data.slice(0, 4).map((post) => (
-                  <div key={post.id} className="col-span-1">
-                    <PostGrid posts={[post]} variant="compact" />
-                  </div>
-                ))}
-              </div>
-            ) : null}
+            )}
           </div>
+        </div>
+        
+        {/* Footer */}
+        <div className="text-center mt-16 pt-8 border-t">
+          <p className="text-muted-foreground text-sm">
+            © 2025 Web Programming Hack Blog All rights reserved.
+          </p>
         </div>
       </div>
     </Layout>

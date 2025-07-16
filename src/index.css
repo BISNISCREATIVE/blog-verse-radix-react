@@ -9,45 +9,45 @@ All colors MUST be HSL.
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 215 25% 27%;
+    --foreground: 0 0% 9%;
 
     --card: 0 0% 100%;
-    --card-foreground: 215 25% 27%;
+    --card-foreground: 0 0% 9%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 215 25% 27%;
+    --popover-foreground: 0 0% 9%;
 
-    --primary: 200 92% 50%;
-    --primary-foreground: 0 0% 98%;
+    --primary: 197 100% 50%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 215 25% 27%;
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 9%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 215 25% 27%;
+    --accent: 0 0% 96%;
+    --accent-foreground: 0 0% 9%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 200 92% 50%;
+    --border: 0 0% 89%;
+    --input: 0 0% 89%;
+    --ring: 197 100% 50%;
 
     /* Blog-specific design tokens */
-    --blog-primary: 200 92% 50%;
-    --blog-primary-foreground: 0 0% 98%;
+    --blog-primary: 197 100% 50%;
+    --blog-primary-foreground: 0 0% 100%;
     --blog-surface: 0 0% 100%;
-    --blog-surface-hover: 210 40% 98%;
-    --blog-text-primary: 215 25% 27%;
-    --blog-text-secondary: 215.4 16.3% 46.9%;
-    --blog-border: 214.3 31.8% 91.4%;
-    --blog-tag-bg: 210 40% 96.1%;
-    --blog-tag-text: 215 25% 27%;
+    --blog-surface-hover: 0 0% 98%;
+    --blog-text-primary: 0 0% 9%;
+    --blog-text-secondary: 0 0% 45%;
+    --blog-border: 0 0% 89%;
+    --blog-tag-bg: 0 0% 96%;
+    --blog-tag-text: 0 0% 9%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
     --sidebar-background: 0 0% 98%;
 
