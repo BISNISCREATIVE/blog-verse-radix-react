@@ -47,7 +47,7 @@ export const LikeButton = ({ postId, likes, isLiked = false, size = "default" }:
             onClick={handleLike}
             disabled={likePost.isPending}
             className={cn(
-              "flex items-center gap-1 transition-colors",
+              "flex items-center gap-1 transition-colors text-muted-foreground hover:text-foreground",
               liked && "text-red-500 hover:text-red-600"
             )}
           >
@@ -57,7 +57,7 @@ export const LikeButton = ({ postId, likes, isLiked = false, size = "default" }:
                 size === "sm" && "h-3 w-3",
                 size === "default" && "h-4 w-4",
                 size === "lg" && "h-5 w-5",
-                liked && "fill-current scale-110"
+                liked && "fill-red-500 text-red-500 scale-110"
               )}
             />
             <span className={cn(

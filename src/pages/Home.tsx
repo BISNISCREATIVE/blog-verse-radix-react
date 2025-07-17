@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronRight, ChevronLeft } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Heart, MessageCircle } from 'lucide-react';
 import { Layout } from '@/components/layout/Layout';
 import { useRecommendedPosts, useMostLikedPosts } from '@/hooks/usePosts';
 import { Button } from '@/components/ui/button';
@@ -165,12 +165,12 @@ export const Home = () => {
                           </div>
                           
                           <div className="flex items-center gap-6 text-muted-foreground">
-                            <div className="flex items-center gap-2">
-                              <span className="text-lg">👍</span>
+                            <div className="flex items-center gap-1">
+                              <Heart className="h-4 w-4" />
                               <span className="font-medium">{post.likes}</span>
                             </div>
-                            <div className="flex items-center gap-2">
-                              <span className="text-lg">💬</span>
+                            <div className="flex items-center gap-1">
+                              <MessageCircle className="h-4 w-4" />
                               <span className="font-medium">{post.comments}</span>
                             </div>
                           </div>
@@ -210,12 +210,12 @@ export const Home = () => {
                       {post.content}
                     </p>
                     <div className="flex items-center gap-6 text-muted-foreground text-sm">
-                      <div className="flex items-center gap-2">
-                        <span>👍</span>
+                      <div className="flex items-center gap-1">
+                        <Heart className="h-3 w-3" />
                         <span className="font-medium">{post.likes}</span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <span>💬</span>
+                      <div className="flex items-center gap-1">
+                        <MessageCircle className="h-3 w-3" />
                         <span className="font-medium">{post.comments}</span>
                       </div>
                     </div>

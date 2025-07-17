@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Search, PenIcon, Menu, User, LogOut } from 'lucide-react';
+import { Search, PenIcon, Menu, User, LogOut, Heart, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useAuth } from '@/hooks/useAuth';
+import { Logo } from '@/components/ui/logo';
 
 export const Header = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -36,11 +37,8 @@ export const Header = () => {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm">📝</span>
-            </div>
-            <span className="font-bold text-xl text-foreground">Your Logo</span>
+          <Link to="/" className="flex items-center">
+            <Logo />
           </Link>
 
           {/* Desktop Search */}
@@ -49,8 +47,8 @@ export const Header = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 type="search"
-                placeholder="Search"
-                className="pl-10 w-full rounded-full border-muted bg-muted/50"
+                placeholder="Frontend Development"
+                className="pl-10 w-full rounded-full border-input bg-background"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={handleSearch}
@@ -67,7 +65,8 @@ export const Header = () => {
                   className="flex items-center gap-2 text-primary hover:text-primary/80 font-medium"
                 >
                   <PenIcon className="h-4 w-4" />
-                  Write Post
+                  <span className="hidden lg:inline">Write Post</span>
+                  <span className="lg:hidden">Write</span>
                 </Link>
                 
                 <DropdownMenu>
@@ -108,7 +107,7 @@ export const Header = () => {
                   Login
                 </Link>
                 <Link to="/register">
-                  <Button className="rounded-full">Register</Button>
+                  <Button>Register</Button>
                 </Link>
               </>
             )}
