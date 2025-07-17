@@ -1,5 +1,6 @@
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { commentsApi } from '@/lib/api';
+import { supabaseCommentsApi } from '@/lib/supabaseApi';
 import { Comment } from '@/types';
 import { useToast } from '@/hooks/use-toast';
 
@@ -8,7 +9,7 @@ export const useComments = (postId: string) => {
   return useQuery({
     queryKey: ['comments', postId],
     queryFn: async (): Promise<Comment[]> => {
-      const response = await commentsApi.getByPost(postId);
+      const response = await supabaseCommentsApi.getByPost(postId);
       return response.data;
     },
     enabled: !!postId,
@@ -22,7 +23,7 @@ export const useCreateComment = () => {
   
   return useMutation({
     mutationFn: async ({ postId, content }: { postId: string; content: string }): Promise<Comment> => {
-      const response = await commentsApi.create(postId, content);
+      const response = await supabaseCommentsApi.create(postId, content);
       return response.data;
     },
     onSuccess: (_, { postId }) => {
@@ -36,7 +37,7 @@ export const useCreateComment = () => {
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.response?.data?.message || "Failed to add comment",
+        description: error.message || "Failed to add comment",
         variant: "destructive",
       });
     },

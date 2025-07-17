@@ -1,5 +1,6 @@
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { postsApi } from '@/lib/api';
+import { supabaseApi } from '@/lib/supabaseApi';
 import { Post, PaginatedResponse, CreatePostData, UpdatePostData } from '@/types';
 import { useToast } from '@/hooks/use-toast';
 
@@ -8,7 +9,7 @@ export const useRecommendedPosts = (limit = 10, page = 1) => {
   return useQuery({
     queryKey: ['posts', 'recommended', limit, page],
     queryFn: async (): Promise<PaginatedResponse<Post>> => {
-      const response = await postsApi.getRecommended(limit, page);
+      const response = await supabaseApi.getRecommended(limit, page);
       return response.data;
     },
   });
@@ -19,7 +20,7 @@ export const useMostLikedPosts = (limit = 10, page = 1) => {
   return useQuery({
     queryKey: ['posts', 'most-liked', limit, page],
     queryFn: async (): Promise<PaginatedResponse<Post>> => {
-      const response = await postsApi.getMostLiked(limit, page);
+      const response = await supabaseApi.getMostLiked(limit, page);
       return response.data;
     },
   });
@@ -30,7 +31,7 @@ export const useMyPosts = (limit = 10, page = 1) => {
   return useQuery({
     queryKey: ['posts', 'my-posts', limit, page],
     queryFn: async (): Promise<PaginatedResponse<Post>> => {
-      const response = await postsApi.getMyPosts(limit, page);
+      const response = await supabaseApi.getMyPosts(limit, page);
       return response.data;
     },
   });
@@ -41,7 +42,7 @@ export const useSearchPosts = (query: string, limit = 10, page = 1) => {
   return useQuery({
     queryKey: ['posts', 'search', query, limit, page],
     queryFn: async (): Promise<PaginatedResponse<Post>> => {
-      const response = await postsApi.search(query, limit, page);
+      const response = await supabaseApi.search(query, limit, page);
       return response.data;
     },
     enabled: !!query,
@@ -53,7 +54,7 @@ export const usePost = (id: string) => {
   return useQuery({
     queryKey: ['posts', id],
     queryFn: async (): Promise<Post> => {
-      const response = await postsApi.getById(id);
+      const response = await supabaseApi.getById(id);
       return response.data;
     },
   });
@@ -64,7 +65,7 @@ export const usePostsByUser = (userId: string, limit = 10, page = 1) => {
   return useQuery({
     queryKey: ['posts', 'by-user', userId, limit, page],
     queryFn: async (): Promise<PaginatedResponse<Post>> => {
-      const response = await postsApi.getByUser(userId, limit, page);
+      const response = await supabaseApi.getByUser(userId, limit, page);
       return response.data;
     },
   });
@@ -85,7 +86,7 @@ export const useCreatePost = () => {
         formData.append('image', data.image);
       }
       
-      const response = await postsApi.create(formData);
+      const response = await supabaseApi.create(formData);
       return response.data;
     },
     onSuccess: () => {
@@ -98,7 +99,7 @@ export const useCreatePost = () => {
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.response?.data?.message || "Failed to create post",
+        description: error.message || "Failed to create post",
         variant: "destructive",
       });
     },
@@ -118,7 +119,7 @@ export const useUpdatePost = () => {
       if (data.tags) formData.append('tags', data.tags.join(','));
       if (data.image) formData.append('image', data.image);
       
-      const response = await postsApi.update(id, formData);
+      const response = await supabaseApi.update(id, formData);
       return response.data;
     },
     onSuccess: () => {
@@ -131,7 +132,7 @@ export const useUpdatePost = () => {
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.response?.data?.message || "Failed to update post",
+        description: error.message || "Failed to update post",
         variant: "destructive",
       });
     },
@@ -145,7 +146,7 @@ export const useDeletePost = () => {
   
   return useMutation({
     mutationFn: async (id: string): Promise<{ success: boolean }> => {
-      const response = await postsApi.delete(id);
+      const response = await supabaseApi.delete(id);
       return response.data;
     },
     onSuccess: () => {
@@ -158,7 +159,7 @@ export const useDeletePost = () => {
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.response?.data?.message || "Failed to delete post",
+        description: error.message || "Failed to delete post",
         variant: "destructive",
       });
     },
@@ -172,7 +173,7 @@ export const useLikePost = () => {
   
   return useMutation({
     mutationFn: async (id: string): Promise<Post> => {
-      const response = await postsApi.like(id);
+      const response = await supabaseApi.like(id);
       return response.data;
     },
     onSuccess: () => {
@@ -181,7 +182,7 @@ export const useLikePost = () => {
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.response?.data?.message || "Failed to like post",
+        description: error.message || "Failed to like post",
         variant: "destructive",
       });
     },

@@ -1,5 +1,6 @@
+
 export interface User {
-  id: number;
+  id: string; // Changed from number to string for UUID
   name: string;
   email: string;
   headline?: string;
@@ -7,7 +8,7 @@ export interface User {
 }
 
 export interface Post {
-  id: number;
+  id: string; // Changed from number to string for UUID
   title: string;
   content: string;
   tags: string[];
@@ -20,7 +21,7 @@ export interface Post {
 }
 
 export interface Comment {
-  id: number;
+  id: string; // Changed from number to string for UUID
   content: string;
   author: User;
   createdAt: string;
